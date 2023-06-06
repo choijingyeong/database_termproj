@@ -6,12 +6,12 @@
 // $dsn = "oci:dbname=".$tns.";charset=utf8";
 // $username = 'd202004187'; $pw = '1234';
 $tns = "(DESCRIPTION=
-    (ADDRESS_LIST= (ADDRESS=(PROTOCOL=TCP)(HOST=DESKTOP-PRUT6TB)
+    (ADDRESS_LIST= (ADDRESS=(PROTOCOL=TCP)(HOST=localhost)
         (PORT=1521)))
     (CONNECT_DATA= (SERVICE_NAME=XE)))";
 $dsn = "oci:dbname=" . $tns . ";charset=utf8";
-$username = 'rentcar';
-$pw = '1234';
+$username = 'c##tp';
+$pw = 'iscp5481';
 
 $conn = new PDO($dsn, $username, $pw);
 
