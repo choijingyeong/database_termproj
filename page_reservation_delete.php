@@ -1,11 +1,13 @@
 <?php
 $license = $_GET['license'];
+$start = $_GET['start'];
+$end = $_GET['end'];
 include "include\session.php";
 include "include\dbConnect.php";
 # 예약 기록 삭제
-$sql = "delete from reservation where licenseplateno=:license";
-$sql = $conn->prepare($sql);
-$sql->bindParam(':license', $license);
-$sql->execute();
+$sql = "delete from reservation where licenseplateno='$license' and startdate='$start' and enddate='$end'";
+$stmt = $conn->prepare($sql);
+$stmt->execute();
+echo ("<SCRIPT>location.href='page_reservation.php?';</SCRIPT>");
 exit;
 ?>
