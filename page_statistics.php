@@ -12,7 +12,7 @@
             text-decoration: none;
         }
     </style>
-    <title>관리자만볼수있는통계화면..</title>
+    <title>통계 페이지</title>
     <script src="statistics.js"></script>
 </head>
 <body>
@@ -21,17 +21,17 @@ if(isset($_GET['name'])){
     $name = $_GET['name'];
     echo "현재 로그인한 name: " . $name;
 } else {
-    echo "로그인이 필요합니다 (쿼리스트링 키 값 name 넣어야 함)";
+    echo "로그인이 필요합니다 (임의로 name=관리자 쿼리스트링 지정)";
 }
 ?>
 <div class="container">
-    <h2 class="text-center">관리자만볼수있는통계화면..</h2>
+    <h2 class="text-center">통계 페이지</h2>
     <?php
     if (!isset($_GET['name'])){
-        echo "관리자 아이디로 로그인 필요함";
+        echo "관리자로 로그인 해주세요.";
     }
     else if ($name != "관리자"){
-        echo "너 관리자아니라서 못봄";
+        echo "관리자만 조회 가능합니다.";
     } else {
     ?>
     <table class="table table-bordered text-center">
