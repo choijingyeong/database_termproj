@@ -48,6 +48,9 @@ if(isset($_GET['name'])){
         <button class="btn btn-primary me-md-2" type="button" onclick="showContent(3)">통계3</button>
     </div>
     <div>
+        <br><br>
+    </div>
+    <div>
         <div class="content-container" id="content-container"></div>
     </div>
     <script>
@@ -58,6 +61,7 @@ if(isset($_GET['name'])){
     
             if (index === 1) {
                 contentContainer.innerHTML = `
+                        <h3>차량번호별 예약 현황</h3>
                         <div id="statictics-container">
                         <p> 검색어를 입력! 대상 licenseplateno를 입력하면 그 차량번호의 정보가 나온다.. </p>
                         <p>차량 번호가 66바5690인 렌터카의 예약 정보에 대해 
