@@ -51,6 +51,7 @@ $rowCount_rentcar = count($rows);
 // 이미 예약한 차량이 있는 경우
 if ($rowCount_reservation > 0) {
     // 예약 불가능 메시지를 표시하거나 적절한 처리를 수행
+    echo "{$start} ~ {$end} <br>";
     echo "이미 해당 기간에 예약한 차량이 있습니다.";
     echo ('
 <header>
@@ -83,6 +84,7 @@ if ($rowCount_reservation > 0) {
     </nav>
 </header>
 ');
+    echo "{$start} ~ {$end} <br>";
     echo "이미 해당 기간에 대여하는 차량이 있습니다.";
 } else {
     // 예약 가능한 경우 예약을 처리하거나 적절한 처리를 수행

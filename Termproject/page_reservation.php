@@ -60,16 +60,17 @@ echo ('
                 <b>차 번호판</b>
             </font>
         </td>
-        <td width=50 align=center>
-            <font size=2 style="font-family: Pretendard Variable">
-                <b>대여 시작 날짜</b>
-            </font>
-        </td>
         <td width=100 align=center>
             <font size=2 style="font-family: Pretendard Variable">
                 <b>예약 날짜</b>
             </font>
         </td>
+        <td width=100 align=center>
+            <font size=2 style="font-family: Pretendard Variable">
+                <b>대여 시작 날짜</b>
+            </font>
+        </td>
+
         <td width=100 align=center>
             <font size=2 style="font-family: Pretendard Variable">
                 <b>반납날짜</b>
@@ -97,10 +98,7 @@ echo ('
                     </div>
             </td>
 
-            <td align=center>
-                <font size=2 style=\"font-family: Pretendard Variable\">
-                    <?= $row2[1] ?>
-            </td>
+
 
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
@@ -108,7 +106,10 @@ echo ('
                 </font>
                 </a>
             </td>
-
+            <td align=center>
+                <font size=2 style=\"font-family: Pretendard Variable\">
+                    <?= $row2[1] ?>
+            </td>
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
                     <?= $row2[3] ?>

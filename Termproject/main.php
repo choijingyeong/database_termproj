@@ -73,7 +73,7 @@ $stmt->execute();
         document.getElementById('end_date').min = start_date;
     }
 </script>
-<form name="research" action="main_search.php" method="POST">
+<form align='center's name="research" action="main_search.php" method="POST">
     <label for="start_date">Start Date:</label>
     <input type="date" id="start_date" name="start_date" required onchange="updateEndDateMin()"
         min="<?php echo date('Y-m-d'); ?>">
