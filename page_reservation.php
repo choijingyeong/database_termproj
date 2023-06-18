@@ -121,11 +121,12 @@ echo ('
                 </font>
             </td>
 
-            <td align=center>
-                <a href='page_reservation_delete.php?passwd=$rec[password]&license = $row2[0]'>
+            <td align="center">
+                <a href="page_reservation_delete.php?license=<?= $row2[0] ?>&start=<?= $row2[1]?>&end=<?= $row2[3]?>">
                     [예약 취소]
                 </a>
             </td>
+
 
 
         </tr>
