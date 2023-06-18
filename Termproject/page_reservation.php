@@ -1,14 +1,16 @@
 <?php
 include "include\dbConnect.php";
 include "include\session.php";
-// echo $_SESSION['ses_usercno'];
-// echo $_SESSION['ses_userid'];///
-$sql = "SELECT Licenseplateno, startdate, reservedate, enddate, cno
-        FROM reservation where cno ='{$_SESSION['ses_usercno']}'
-        ";
+
+$sql = "SELECT r.Licenseplateno, cm.modelName, r.startdate, r.reservedate, r.enddate, r.cno
+FROM reservation r
+JOIN rentcar rc ON r.Licenseplateno = rc.Licenseplateno
+JOIN carmodel cm ON rc.modelName = cm.modelName
+WHERE r.cno = '{$_SESSION['ses_usercno']}'";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 ?>
+
 <html>
 
 <head>
@@ -52,9 +54,36 @@ echo ('
 ');
 ?>
 
+
+<?php
+if (isset($_POST['search'])) {
+
+    $model = $_POST['search'];
+    $sql = "SELECT r.Licenseplateno, cm.modelName, r.startdate, r.reservedate, r.enddate, r.cno
+    FROM reservation r
+    JOIN rentcar rc ON r.Licenseplateno = rc.Licenseplateno
+    JOIN carmodel cm ON rc.modelName = cm.modelName
+    WHERE r.cno = '{$_SESSION['ses_usercno']}'and cm.modelname LIKE '%$model%'";
+    // 예약 내역 조회 쿼리
+    // $sql = "SELECT * FROM reservation WHERE ";
+    // 쿼리 실행 및 결과 가져오기
+    // ...
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    // 결과 출력
+    // ...
+}
+?>
+
+
 </html>
 <table border=0 width=580 style='table-layout:fixed;'>
     <tr height=25 bgcolor='#eef0f4'>
+        <td width=100 align=center>
+            <font size=2 style="font-family: Pretendard Variable">
+                <b>모델 이름</b>
+            </font>
+        </td>
         <td width=200 align=center>
             <font size=2 style="font-family: Pretendard Variable">
                 <b>차 번호판</b>
@@ -94,7 +123,7 @@ echo ('
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
                     <div>
-                        <?= $row2[0] ?>
+                        <?= $row2[1] ?>
                     </div>
             </td>
 
@@ -102,17 +131,17 @@ echo ('
 
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
-                    <?= $row2[2] ?>
+                    <?= $row2[0] ?>
                 </font>
                 </a>
             </td>
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
-                    <?= $row2[1] ?>
+                    <?= $row2[3] ?>
             </td>
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
-                    <?= $row2[3] ?>
+                    <?= $row2[2] ?>
                 </font>
             </td>
 
@@ -121,10 +150,15 @@ echo ('
                     <?= $row2[4] ?>
                 </font>
             </td>
+            <td align=center>
+                <font size=2 style=\"font-family: Pretendard Variable\">
+                    <?= $row2[5] ?>
+                </font>
+            </td>
 
-            <td align="center">
-                <a href="page_reservation_delete.php?license=<?= $row2[0] ?>&start=<?= $row2[1] ?>&end=<?= $row2[3] ?>">
-                    [예약 취소]
+            <td align="center" style=" font-family: Pretendard Variable">
+                <a href="page_reservation_delete.php?license=<?= $row2[0] ?>&start=<?= $row2[2] ?>&end=<?= $row2[4] ?> ">
+                    예약 취소
                 </a>
             </td>
 
@@ -138,8 +172,24 @@ echo ('
         <!-- "); -->
         <?php
     }
-
-
-
     ?>
 </table>
+
+<form action="page_reservation.php?" method="post">
+    <table>
+        <tr>
+            <td align="center">
+
+                <input type="text" name="search" size="15" style="font-family: Pretendard Variable"
+                    placeholder="모델 이름 검색">
+                <input type="submit" style="font-family: Pretendard Variable" value="검색">
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form action="page_reservation.php">
+
+    <input type="submit" style="font-family: Pretendard Variable" value="초기화">
+
+</form>

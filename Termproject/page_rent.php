@@ -2,10 +2,11 @@
 
 include "include\dbConnect.php";
 include "include\session.php";
-$sql = "SELECT rc.Licenseplateno, cm.modelName, rc.daterented, rc.returndate, cm.rentrateperday *(rc.returndate-rc.daterented)
-FROM rentcar rc
-JOIN carmodel cm ON rc.modelName = cm.modelName
-WHERE rc.cno = '{$_SESSION['ses_usercno']}'";
+$sql = "SELECT rc.Licenseplateno, cm.modelName, rc.daterented, rc.returndate, 
+    cm.rentrateperday *(rc.returndate-rc.daterented)
+    FROM rentcar rc
+    JOIN carmodel cm ON rc.modelName = cm.modelName
+    WHERE rc.cno = '{$_SESSION['ses_usercno']}'";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 ?>
@@ -43,6 +44,28 @@ echo ('
 </header>
 ');
 ?>
+
+<?php
+if (isset($_POST['search'])) {
+
+    $model = $_POST['search'];
+    $sql = "SELECT rc.Licenseplateno, cm.modelName, rc.daterented, rc.returndate, 
+    cm.rentrateperday *(rc.returndate-rc.daterented)
+    FROM rentcar rc
+    JOIN carmodel cm ON rc.modelName = cm.modelName
+    WHERE rc.cno = '{$_SESSION['ses_usercno']}'and cm.modelname LIKE '%$model%'";
+    // 예약 내역 조회 쿼리
+    // $sql = "SELECT * FROM reservation WHERE ";
+    // 쿼리 실행 및 결과 가져오기
+    // ...
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    // 결과 출력
+    // ...
+}
+?>
+
+
 <table border=0 width=580 style='table-layout:fixed;'>
     <tr height=25 bgcolor='#eef0f4'>
         <td width=100 align=center>
@@ -112,7 +135,7 @@ echo ('
             </td>
 
             <td align="center">
-                <a href="page_rent_delete.php?license=<?= $row2[0] ?>&start=<?= $row2[1] ?>&end=<?= $row2[2] ?>">
+                <a href="page_rent_delete.php?license=<?= $row2[0] ?>&start=<?= $row2[2] ?>&end=<?= $row2[3] ?>">
                     [결제하기]
                 </a>
             </td>
@@ -130,5 +153,23 @@ echo ('
 
     ?>
 </table>
+<form action="page_rent.php?" method="post">
+    <table>
+        <tr>
+            <td align="center">
+
+                <input type="text" name="search" size="15" style="font-family: Pretendard Variable"
+                    placeholder="모델 이름 검색">
+                <input type="submit" style="font-family: Pretendard Variable" value="검색">
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form action="page_rent.php">
+
+    <input type="submit" style="font-family: Pretendard Variable" value="초기화">
+
+</form>
 
 </html>
