@@ -14,8 +14,7 @@ $cno = $_SESSION['ses_usercno'];
 
 // 이미 예약한 차량이 있는지 확인하는 SQL 쿼리
 $checkReservationQuery = "SELECT * FROM Reservation 
-                        WHERE licensePlateNo = :licensePlateNo 
-                        AND cno = {$cno}
+                        WHERE cno = {$cno}
                         AND (startDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
                         OR endDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
                         OR (startDate <= TO_DATE(:startDate, 'YYYY-MM-DD') AND endDate >= TO_DATE(:endDate, 'YYYY-MM-DD')))
@@ -42,7 +41,6 @@ $query = "SELECT *
 $checkRentcarStmt = $conn->prepare($query);
 $checkRentcarStmt->bindParam(":startDate", $start);
 $checkRentcarStmt->bindParam(":endDate", $end);
-$checkRentcarStmt->bindParam(":selectedLicensePlateNo", $license);
 $checkRentcarStmt->execute();
 
 $rows = $checkRentcarStmt->fetchAll();
@@ -107,8 +105,6 @@ if ($rowCount_reservation > 0) {
 
     // 쿼리 실행
     $reservationStmt->execute();
-    $stmt = $conn->prepare($sql);
-    $stmt->execute();
     // echo $sql;
     echo ("<SCRIPT>location.href='page_reservation.php?';</SCRIPT>");
     exit;
