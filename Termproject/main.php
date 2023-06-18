@@ -48,7 +48,9 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         echo '<br><br><a href="/Termproject/page_rent.php"> 대여 내역 </a>';
 
         echo '<br><br><a href="/Termproject/page_previous_rent.php"> 이전 대여 내역 </a>';
-
+        // if ($_SESSION['ses_usercno'] == 'mgr') {
+        //     echo '<br><br><a href="/Termproject/page_statistics.php"> 통계 </a>';
+        // }
         echo '<br><br><a href="/Termproject/page_statistics.php"> 통계 </a>';
         break;
     }
@@ -56,8 +58,8 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 }
 if ($row == null) {
-    echo '로그인 실패 아이디와 비밀번호가 일치하지 않습니다.';
-    echo '<a href="/Termproject/page_login.php">로그인</a>';
+    echo '로그인 실패! 아이디와 비밀번호가 일치하지 않습니다.';
+    echo '<br><a href="/Termproject/page_login.php">다시 로그인</a>';
 }
 
 $sql = "select * from carmodeloptions";

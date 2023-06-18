@@ -7,27 +7,12 @@ include "include\session.php";
 
 ?>
 <?php
-// $tns = "
-// 	(DESCRIPTION=
-// 		(ADDRESS_LIST=
-// 			(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))
-// 		)
-// 		(CONNECT_DATA=
-// 			(SERVICE_NAME=XE)
-// 		)
-// 	)
-// ";
-// $url = "oci:dbname=".$tns.";charset=utf8";
-// $username = 'c##tp';
-// $password = 'iscp5481';
 $searchWord = $_GET['searchWord'] ?? '';
 
 if (!isset($_GET['searchWord'])) {
     echo "검색해주세요!";
 } else if (isset($_GET['searchWord']) or $_GET['searchWord'] != '') {
     try {
-        $conn = new PDO($url, $username, $password);
-
         $stmt = $conn->prepare("
             SELECT RC.MODELNAME, R.STARTDATE, R.ENDDATE, C.CNO, C.NAME, C.EMAIL
             FROM RENTCAR RC

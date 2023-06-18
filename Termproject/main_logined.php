@@ -45,8 +45,11 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         echo '<br><br><a href="/Termproject/page_rent.php"> 대여 내역 </a>';
 
         echo '<br><br><a href="/Termproject/page_previous_rent.php"> 이전 대여 내역 </a>';
-
         echo '<br><br><a href="/Termproject/page_statistics.php"> 통계 </a>';
+
+        // if ($_SESSION['ses_usercno'] == 'mgr') {
+        //     echo '<br><br><a href="/Termproject/page_statistics.php"> 통계 </a>';
+        // }
         break;
     }
 
