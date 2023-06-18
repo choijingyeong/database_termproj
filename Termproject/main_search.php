@@ -46,19 +46,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search_button"])) {
     $vehicleTypes = $_POST["vehicle_type"];
     echo "{$startDate} ~ {$endDate} ";
 
-    $query = "select DISTINCT rc.licenseplateno,cm.* from carmodel cm 
-        JOIN RentCar rc ON cm.modelName = rc.modelName 
-        LEFT JOIN Reservation r ON rc.licensePlateNo = r.licensePlateNo WHERE (
-        rc.dateRented IS NULL OR
-        rc.returnDate IS NULL OR
-        rc.returnDate < to_date(:startDate, 'yyyy-mm-dd') OR
-        rc.dateRented > to_date(:endDate, 'yyyy-mm-dd')
-        )AND (
-        r.startDate IS NULL OR
-        r.endDate IS NULL OR
-        r.startDate > to_date(:endDate, 'yyyy-mm-dd') OR
-        r.endDate < to_date(:startDate, 'yyyy-mm-dd')
-        )AND (";
+    $query = "SELECT rc.licensePlateNo, cm.*
+    FROM CarModel cm
+    INNER JOIN RentCar rc ON cm.modelName = rc.modelName
+    WHERE rc.licensePlateNo NOT IN (
+        SELECT rc2.licensePlateNo
+        FROM RentCar rc2
+        WHERE (rc2.dateRented <=:endDate) AND (rc2.returnDate >= :startDate)
+    )AND rc.licensePlateNo NOT IN (
+        SELECT r.licensePlateNo
+        FROM Reservation r
+        WHERE (r.STARTDATE <=:endDate) AND (r.ENDDATE >= :startDate)
+    )
+    AND (";
 
     $typesCount = count($vehicleTypes);
     for ($i = 0; $i < $typesCount; $i++) {
@@ -87,7 +87,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search_button"])) {
     //     }
     // }
     $stmt->execute();
-    echo $query;
 
     ?>
 
