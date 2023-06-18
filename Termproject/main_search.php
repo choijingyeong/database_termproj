@@ -16,6 +16,7 @@
 
 </html>
 <?php
+
 echo ('
 <header>
     <nav id="navBar">
@@ -35,53 +36,30 @@ echo ('
 <?php
 include "include\session.php";
 include "include\dbConnect.php";
-
-// 대여 기간과 차량 유형 가져오기
-// $startDate = $_POST['start_date'];
-// $endDate = $_POST['end_date'];
-// $vehicleType = isset($_POST['vehicle_type']) ? $_POST['vehicle_type'] : '';
+echo $_SESSION['ses_username'] . '님 안녕하세요 ';
+echo $_SESSION['ses_email'] . '계정';
+echo "<br>";
 // POST 데이터 확인
 if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search_button"])) {
     $startDate = $_POST["start_date"];
     $endDate = $_POST["end_date"];
     $vehicleTypes = $_POST["vehicle_type"];
-    echo "{$startDate} ~ {$endDate}";
-    // 예약 가능한 차량 조회를 위한 SQL 쿼리 생성
-    // $query = "SELECT cm.carModel, cm.vehicleType, cm.price, cm.fuelType, cm.seatCapacity
-    //         FROM Carmodel cm
-    //         LEFT JOIN Reservation r ON cm.carModel = r.carModel
-    //             AND (r.startDate not BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
-    //             OR r.endDate not BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD'))
-    //         WHERE (r.licensePlateNo IS NULL OR r.endDate < TO_DATE(:startDate, 'YYYY-MM-DD'))
-    //             AND (";
+    echo "{$startDate} ~ {$endDate} ";
 
-    // $query = "SELECT DISTINCT rc.licenseplateno,cm.* FROM CarModel cm 
-    // JOIN RentCar rc ON cm.modelName = rc.modelName 
-    // LEFT JOIN Reservation r ON rc.licensePlateNo = r.licensePlateNo 
-    // WHERE ( rc.dateRented IS NULL OR rc.returnDate IS NULL 
-    // OR rc.returnDate < to_date('{$startDate}', 'yyyy-mm-dd') 
-    // OR rc.dateRented > to_date('{$endDate}', 'yyyy-mm-dd'))
-    // AND ( r.startDate IS NULL OR r.endDate IS NULL 
-    // OR r.endDate < to_date('{$startDate}', 'yyyy-mm-dd')
-    // OR r.startDate > to_date('{$endDate}', 'yyyy-mm-dd'))
-    // order by rc.licenseplateno;";
-
-    $query = "select DISTINCT rc.licenseplateno,cm.* from carmodel cm JOIN RentCar rc ON cm.modelName = rc.modelName LEFT JOIN Reservation r ON rc.licensePlateNo = r.licensePlateNo WHERE (
+    $query = "select DISTINCT rc.licenseplateno,cm.* from carmodel cm 
+        JOIN RentCar rc ON cm.modelName = rc.modelName 
+        LEFT JOIN Reservation r ON rc.licensePlateNo = r.licensePlateNo WHERE (
         rc.dateRented IS NULL OR
         rc.returnDate IS NULL OR
-        rc.returnDate < to_date('{$startDate}', 'yyyy-mm-dd') OR
-        rc.dateRented > to_date('{$endDate}', 'yyyy-mm-dd')
-      )AND (
+        rc.returnDate < to_date(:startDate, 'yyyy-mm-dd') OR
+        rc.dateRented > to_date(:endDate, 'yyyy-mm-dd')
+        )AND (
         r.startDate IS NULL OR
         r.endDate IS NULL OR
-        r.startDate > to_date('{$endDate}', 'yyyy-mm-dd') OR
-        r.endDate < to_date('{$startDate}', 'yyyy-mm-dd')
-      )AND (";
+        r.startDate > to_date(:endDate, 'yyyy-mm-dd') OR
+        r.endDate < to_date(:startDate, 'yyyy-mm-dd')
+        )AND (";
 
-    //   order by rc.licenseplateno";
-
-    // AND (";
-    // // 선택한 차량 타입에 따라 조건 추가
     $typesCount = count($vehicleTypes);
     for ($i = 0; $i < $typesCount; $i++) {
 
@@ -93,12 +71,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search_button"])) {
         } else {
             $query .= "cm.vehicleType = '{$vehicleTypes[$i]}'";
         }
-        echo $vehicleTypes[$i];
+        echo "{$vehicleTypes[$i]} 예약 가능 차량";
     }
     $query .= ")order by rc.licenseplateno";
     // $query .= ")order by rc.licenseplateno";
     // SQL 쿼리 실행
     $stmt = $conn->prepare($query);
+    $stmt->bindParam(":startDate", $startDate);
+    $stmt->bindParam(":endDate", $endDate);
     // $stmt->bindParam(":startDate", $startDate);
     // $stmt->bindParam(":endDate", $endDate);
     // for ($i = 0; $i < $typesCount; $i++) {
@@ -107,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search_button"])) {
     //     }
     // }
     $stmt->execute();
-
+    echo $query;
 
     ?>
 
@@ -177,18 +157,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search_button"])) {
                             <?= $row2[5] ?>
                         </div>
                 </td>
+                <td align="center">
+                    <a href="main_reservation.php?license=<?= $row2[0] ?>&start=<?= $startDate ?>&end=<?= $endDate ?>">
+                        [예약하기]
+                    </a>
+                </td>
 
-                <form method="post" action="">
-                    <input type="hidden" name="start_date" value="<?php echo $_POST['start_date']; ?>">
-                    <input type="hidden" name="end_date" value="<?php echo $_POST['end_date']; ?>">
-
-                    <input type="hidden" name="license_plate_no" value="<?= $row2[0] ?>">
-                    <td align=center>
-                        <button type="submit" name="reservation_button">
-                            예약하기
-                        </button>
-                    </td>
-                </form>
 
 
             </tr>
@@ -206,62 +180,86 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["search_button"])) {
     <?php
     // Oracle DB 접속 종료
 }
-// 예약 버튼을 눌렀을 때 해당 고객이 이미 예약한 차량이 있는지 확인
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["reservation_button"])) {
-    $selectedLicensePlateNo = $_POST["license_plate_no"]; // 선택한 차량의 라이선스 번호
-    $customerID = $_SESSION["ses_usercno"]; // 현재 로그인된 고객의 ID
-    $startDate = $_POST["start_date"];
-    $endDate = $_POST["end_date"];
+// // 예약 버튼을 눌렀을 때 해당 고객이 이미 예약한 차량이 있는지 확인
+// if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["reservation_button"])) {
+//     $selectedLicensePlateNo = $_POST["license_plate_no"]; // 선택한 차량의 라이선스 번호
+//     $customerID = $_SESSION["ses_usercno"]; // 현재 로그인된 고객의 ID
+//     $startDate = $_POST["start_date"];
+//     $endDate = $_POST["end_date"];
 
-    echo "{$startDate} ~ {$endDate} <br>";
-    // 이미 예약한 차량이 있는지 확인하는 SQL 쿼리
-    $checkReservationQuery = "SELECT * FROM Reservation 
-                        WHERE licensePlateNo = :licensePlateNo 
-                        AND cno = {$customerID}
-                        AND (startDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
-                        OR endDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
-                        OR (startDate <= TO_DATE(:startDate, 'YYYY-MM-DD') AND endDate >= TO_DATE(:endDate, 'YYYY-MM-DD')))
-                        ";
+//     echo "{$startDate} ~ {$endDate} <br>";
+//     // 이미 예약한 차량이 있는지 확인하는 SQL 쿼리
+//     $checkReservationQuery = "SELECT * FROM Reservation 
+//                         WHERE licensePlateNo = :licensePlateNo 
+//                         AND cno = {$customerID}
+//                         AND (startDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
+//                         OR endDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
+//                         OR (startDate <= TO_DATE(:startDate, 'YYYY-MM-DD') AND endDate >= TO_DATE(:endDate, 'YYYY-MM-DD')))
+//                         ";
 
-    $checkReservationStmt = $conn->prepare($checkReservationQuery);
-    $checkReservationStmt->bindParam(":licensePlateNo", $selectedLicensePlateNo);
-    $checkReservationStmt->bindParam(":customerID", $customerID);
-    $checkReservationStmt->bindParam(":startDate", $startDate);
-    $checkReservationStmt->bindParam(":endDate", $endDate);
-    $checkReservationStmt->execute();
+//     $checkReservationStmt = $conn->prepare($checkReservationQuery);
+//     $checkReservationStmt->bindParam(":licensePlateNo", $selectedLicensePlateNo);
+//     $checkReservationStmt->bindParam(":customerID", $customerID);
+//     $checkReservationStmt->bindParam(":startDate", $startDate);
+//     $checkReservationStmt->bindParam(":endDate", $endDate);
+//     $checkReservationStmt->execute();
 
-    $rows = $checkReservationStmt->fetchAll();
-    $rowCount_reservation = count($rows);
+//     $rows = $checkReservationStmt->fetchAll();
+//     $rowCount_reservation = count($rows);
 
-    // 이미 예약한 차량이 있는지 확인하는 SQL 쿼리 작성
-    $query = "SELECT licensePlateNo
-                FROM RentCar
-                WHERE cno = {$customerID}
-                AND (dateRented BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
-                OR returnDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
-                OR (dateRented <= TO_DATE(:startDate, 'YYYY-MM-DD') AND returnDate >= TO_DATE(:endDate, 'YYYY-MM-DD')))
-                ";
+//     // 이미 예약한 차량이 있는지 확인하는 SQL 쿼리 작성
+//     $query = "SELECT licensePlateNo
+//                 FROM RentCar
+//                 WHERE cno = {$customerID}
+//                 AND (dateRented BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
+//                 OR returnDate BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD')
+//                 OR (dateRented <= TO_DATE(:startDate, 'YYYY-MM-DD') AND returnDate >= TO_DATE(:endDate, 'YYYY-MM-DD')))
+//                 ";
 
-    $checkRentcarStmt = $conn->prepare($query);
-    $checkRentcarStmt->bindParam(":startDate", $startDate);
-    $checkRentcarStmt->bindParam(":endDate", $endDate);
-    $checkRentcarStmt->bindParam(":selectedLicensePlateNo", $selectedLicensePlateNo);
-    $checkRentcarStmt->execute();
+//     $checkRentcarStmt = $conn->prepare($query);
+//     $checkRentcarStmt->bindParam(":startDate", $startDate);
+//     $checkRentcarStmt->bindParam(":endDate", $endDate);
+//     $checkRentcarStmt->bindParam(":selectedLicensePlateNo", $selectedLicensePlateNo);
+//     $checkRentcarStmt->execute();
 
-    $rows = $checkRentcarStmt->fetchAll();
-    $rowCount_rentcar = count($rows);
+//     $rows = $checkRentcarStmt->fetchAll();
+//     $rowCount_rentcar = count($rows);
 
-    // 이미 예약한 차량이 있는 경우
-    if ($rowCount_reservation > 0) {
-        // 예약 불가능 메시지를 표시하거나 적절한 처리를 수행
-        echo "이미 해당 기간에 예약한 차량이 있습니다.";
-    } else if ($rowCount_rentcar > 0) {
-        echo "이미 해당 기간에 대여하는 차량이 있습니다.";
-    } else {
-        // 예약 가능한 경우 예약을 처리하거나 적절한 처리를 수행
-        echo "예약이 가능합니다.";
-    }
-}
+//     // 이미 예약한 차량이 있는 경우
+//     if ($rowCount_reservation > 0) {
+//         // 예약 불가능 메시지를 표시하거나 적절한 처리를 수행
+//         echo "이미 해당 기간에 예약한 차량이 있습니다.";
+//     } else if ($rowCount_rentcar > 0) {
+//         echo "이미 해당 기간에 대여하는 차량이 있습니다.";
+//     } else {
+//         // 예약 가능한 경우 예약을 처리하거나 적절한 처리를 수행
+//         echo "예약이 가능합니다.";
+//         $today = date('Y-m-d');
+//         $cno = $_SESSION['ses_usercno'];
+//         $sql = "INSERT INTO RESERVATION (licensePlateNo, dateReserved, dateRented, returnDate, cno)
+//         VALUES (:license, 
+//                 TO_DATE(:dateRented, 'YYYY-MM-DD'), 
+//                 TO_DATE(:today, 'YYYY-MM-DD'), 
+//                 TO_DATE(:returnDate, 'YYYY-MM-DD'), 
+//                 :cno)";
+
+//         // PDOStatement 객체 생성
+//         $reservationStmt = $conn->prepare($sql);
+
+//         // 매개변수 바인딩
+//         $reservationStmt->bindParam(":license", $license);
+//         $reservationStmt->bindParam(":today", $today);
+//         $reservationStmt->bindParam(":dateRented", $startDate);
+//         $reservationStmt->bindParam(":returnDate", $endDate);
+//         $reservationStmt->bindParam(":cno", $cno);
+//         // 쿼리 실행
+//         $reservationStmt->execute();
+//         $stmt = $conn->prepare($sql);
+//         $stmt->execute();
+//         echo ("<SCRIPT>location.href='page_reservation.php?';</SCRIPT>");
+//         exit;
+//     }
+// }
 ?>
 
 <!-- 
