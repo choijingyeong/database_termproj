@@ -16,12 +16,8 @@
 </head>
 <font size=5 style="font-family: Pretendard Variable"><b> 다함께 차차 </font></b><br>
 
-
-
-
 </html>
 <?php
-// include "include\session.php";
 include "include\dbConnect.php";
 session_start();
 
@@ -45,6 +41,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
         echo '<br><br><a href="/Termproject/page_rent.php"> 대여 내역 </a>';
 
         echo '<br><br><a href="/Termproject/page_previous_rent.php"> 이전 대여 내역 </a>';
+
         echo '<br><br><a href="/Termproject/page_statistics.php"> 통계 </a>';
 
         break;
@@ -61,9 +58,6 @@ if ($row == null) {
 $sql = "select * from carmodeloptions";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
-// while ($row2 = $stmt->fetch(PDO::FETCH_BOTH)) {
-//     echo "<div> $row2[0] $row2[1] $row2[2] $row2[3] $row2[4] $row2[5]</div>";
-// }
 ?>
 <script>
     // start_date 값이 변경될 때마다 end_date의 최소 날짜를 설정하는 함수

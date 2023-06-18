@@ -48,6 +48,27 @@ echo ('
 </header>
 ');
 ?>
+<?php
+if (isset($_POST['search'])) {
+
+    $model = $_POST['search'];
+    $sql = "SELECT pr.Licenseplateno, cm.modelName, pr.daterented, pr.datereturned, pr.payment
+    FROM previousrental pr
+    JOIN rentcar rc ON pr.Licenseplateno = rc.Licenseplateno
+    JOIN carmodel cm ON rc.modelName = cm.modelName
+    WHERE pr.cno = '{$_SESSION['ses_usercno']}'and cm.modelname LIKE '%$model%'";
+    // 예약 내역 조회 쿼리
+    // $sql = "SELECT * FROM reservation WHERE ";
+    // 쿼리 실행 및 결과 가져오기
+    // ...
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    // 결과 출력
+    // ...
+}
+?>
+
+
 <table border=0 width=580 style='table-layout:fixed;'>
     <tr height=25 bgcolor='#eef0f4'>
         <td width=100 align=center>
@@ -128,5 +149,23 @@ echo ('
 
     ?>
 </table>
+<form action="page_previous_rent.php?" method="post">
+    <table>
+        <tr>
+            <td align="center">
+
+                <input type="text" name="search" size="15" style="font-family: Pretendard Variable"
+                    placeholder="모델 이름 검색">
+                <input type="submit" style="font-family: Pretendard Variable" value="검색">
+            </td>
+        </tr>
+    </table>
+</form>
+
+<form action="page_previous_rent.php">
+
+    <input type="submit" style="font-family: Pretendard Variable" value="초기화">
+
+</form>
 
 </html>
