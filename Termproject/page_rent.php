@@ -2,8 +2,10 @@
 
 include "include\dbConnect.php";
 include "include\session.php";
-$sql = "SELECT Licenseplateno, daterented, returndate, cno
-            FROM rentcar where cno ='{$_SESSION['ses_usercno']}'";
+$sql = "SELECT rc.Licenseplateno, cm.modelName, rc.daterented, rc.returndate, cm.rentrateperday *(rc.returndate-rc.daterented)
+FROM rentcar rc
+JOIN carmodel cm ON rc.modelName = cm.modelName
+WHERE rc.cno = '{$_SESSION['ses_usercno']}'";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 ?>
@@ -43,28 +45,33 @@ echo ('
 ?>
 <table border=0 width=580 style='table-layout:fixed;'>
     <tr height=25 bgcolor='#eef0f4'>
-        <td width=200 align=center>
+        <td width=100 align=center>
+            <font size=2 style="font-family: Pretendard Variable">
+                <b>모델 이름</b>
+            </font>
+        </td>
+        <td width=100 align=center>
             <font size=2 style="font-family: Pretendard Variable">
                 <b>차 번호판</b>
             </font>
         </td>
-        <td width=50 align=center>
+        <td width=100 align=center>
             <font size=2 style="font-family: Pretendard Variable">
                 <b>대여 시작 날짜</b>
             </font>
         </td>
         <td width=100 align=center>
             <font size=2 style="font-family: Pretendard Variable">
-                <b>반납날짜</b>
+                <b>반납 및 결제 날짜</b>
             </font>
         </td>
         <td width=100 align=center>
             <font size=2 style="font-family: Pretendard Variable">
-                <b>cno</b>
+                <b>결제 예정 금액</b>
             </font>
         </td>
         <td width=150 align=center>
-            <font size=2><b>반납하기</b></font>
+            <font size=2><b>결제하기</b></font>
         </td>
     </tr>
 
@@ -76,13 +83,13 @@ echo ('
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
                     <div>
-                        <?= $row2[0] ?>
+                        <?= $row2[1] ?>
                     </div>
             </td>
 
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
-                    <?= $row2[1] ?>
+                    <?= $row2[0] ?>
             </td>
 
             <td align=center>
@@ -98,10 +105,15 @@ echo ('
                     <?= $row2[3] ?>
                 </font>
             </td>
+            <td align=center>
+                <font size=2 style=\"font-family: Pretendard Variable\">
+                    <?= $row2[4] ?>
+                </font>
+            </td>
 
             <td align="center">
                 <a href="page_rent_delete.php?license=<?= $row2[0] ?>&start=<?= $row2[1] ?>&end=<?= $row2[2] ?>">
-                    [반납하기]
+                    [결제하기]
                 </a>
             </td>
 

@@ -2,8 +2,15 @@
 
 include "include\dbConnect.php";
 include "include\session.php";
-$sql = "SELECT Licenseplateno, daterented, datereturned, payment
-            FROM previousrental where cno ='{$_SESSION['ses_usercno']}'";
+// $sql = "SELECT rc.Licenseplateno, cm.modelName, rc.daterented, rc.returndate, cm.rentrateperday *(rc.returndate-rc.daterented)
+// FROM rentcar rc
+// JOIN carmodel cm ON rc.modelName = cm.modelName
+// WHERE rc.cno = '{$_SESSION['ses_usercno']}'";
+$sql = "SELECT pr.Licenseplateno, cm.modelName, pr.daterented, pr.datereturned, pr.payment
+FROM previousrental pr
+JOIN rentcar rc ON pr.Licenseplateno = rc.Licenseplateno
+JOIN carmodel cm ON rc.modelName = cm.modelName
+WHERE pr.cno = '{$_SESSION['ses_usercno']}'";
 $stmt = $conn->prepare($sql);
 $stmt->execute();
 ?>
@@ -43,6 +50,11 @@ echo ('
 ?>
 <table border=0 width=580 style='table-layout:fixed;'>
     <tr height=25 bgcolor='#eef0f4'>
+        <td width=100 align=center>
+            <font size=2 style="font-family: Pretendard Variable">
+                <b>모델 이름</b>
+            </font>
+        </td>
         <td width=200 align=center>
             <font size=2 style="font-family: Pretendard Variable">
                 <b>차 번호판</b>
@@ -73,13 +85,13 @@ echo ('
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
                     <div>
-                        <?= $row2[0] ?>
+                        <?= $row2[1] ?>
                     </div>
             </td>
 
             <td align=center>
                 <font size=2 style=\"font-family: Pretendard Variable\">
-                    <?= $row2[1] ?>
+                    <?= $row2[0] ?>
             </td>
 
             <td align=center>
@@ -94,6 +106,12 @@ echo ('
                 <font size=2 style=\"font-family: Pretendard Variable\">
                     <?= $row2[3] ?>
                 </font>
+            </td>
+            <td align=center>
+                <font size=2 style=\"font-family: Pretendard Variable\">
+                    <div>
+                        <?= $row2[4] ?>
+                    </div>
             </td>
 
 
